@@ -1,12 +1,14 @@
 package models
 
 import (
-	"fmt"
+	"errors"
 	"log"
 
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
+
+var db = dbConnect()
 
 // User struct
 type User struct {
@@ -26,19 +28,79 @@ func CreateUser(email, username, fullname, password string) (*User, error) {
 	user.Fullname = fullname
 	pwd := getPwdBytes(password)
 	user.Password = hashAndSalt(pwd)
-	db.Create(&user)
+
+	// save new user to db
+	if err := db.Create(&user).Error; err != nil {
+		return nil, err
+	}
 	return &user, nil
 }
 
-func getPwdBytes(password string) []byte {
-	var pwd string
-	// Read the  password
-	_, err := fmt.Scan(&pwd)
-	if err != nil {
-		log.Fatal(err)
+// GetUsers func
+func GetUsers() (*[]User, error) {
+	var userList []User
+
+	// get all users from database
+	if err := db.Find(&userList).Error; err != nil {
+		return nil, err
 	}
+
+	if len(userList) > 0 {
+		return &userList, nil
+	}
+	return nil, errors.New("no users in db")
+}
+
+// GetUser func
+func GetUser(id string) (*User, error) {
+	var user User
+
+	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	if user.ID == id {
+		return &user, nil
+	}
+
+	return nil, errors.New("cannot find user with given id")
+}
+
+// UpdateUser func
+func UpdateUser(id, email, username, fullname string) (*User, error) {
+	user, err := GetUser(id)
+	if err != nil {
+		return nil, errors.New(err.Error())
+	}
+
+	user.Username = username
+	user.Email = email
+	user.Fullname = fullname
+
+	if err := db.Save(user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+// DeleteUser func
+func DeleteUser(id string) (string, error) {
+	user, err := GetUser(id)
+	if err != nil {
+		return "", err
+	}
+
+	if err := db.Delete(&user).Error; err != nil {
+		return "", err
+	}
+
+	return "delete successful", nil
+}
+
+func getPwdBytes(password string) []byte {
 	// Return the password as a byte slice
-	return []byte(pwd)
+	return []byte(password)
 }
 
 func hashAndSalt(pwd []byte) string {
