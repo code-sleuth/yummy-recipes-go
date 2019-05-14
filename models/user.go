@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,7 +22,7 @@ type User struct {
 // CreateUser func
 func CreateUser(email, username, fullname, password string) (*User, error) {
 	var user User
-	user.ID = uuid.Must(uuid.NewV4()).String()
+	user.ID = uuid.NewV4().String()
 	user.Email = email
 	user.Username = username
 	user.Fullname = fullname
