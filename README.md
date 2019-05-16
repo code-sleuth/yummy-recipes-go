@@ -14,5 +14,5 @@ This is a minimalistic REST api written in [Go](https://golang.org/).
 | POST /users | Creates a user |```{"email": "e@gmail.com", "username": "megatron", "fullname": "Mega Tron", "password": "eX@mpL3"}```
 | GET /users | Get all users |
 | GET /users/{id} | Get a single user |
-| PUT /users/{id} | Update user | ```{"email": "e@gmail.com", "username": "megatron", "fullname": "Mega Tron", "password": "eX@mpL3"}```
-| DELETE /users/{id} | Delete user |
+| PUT /users/{id} | Update user | ```{"email": "e@gmail.com", "username": "gigatron", "fullname": "Giga Tron"}```
+| DELETE /users/{id} | Delete user | 
